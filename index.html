@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#2fcdc2">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Skippy the Stone</title>
+<link rel="stylesheet" href="./fonts.css">
+  <script type="module" crossorigin src="./game.js"></script>
+  <link rel="stylesheet" crossorigin href="./index.css">
+</head>
+<body>
+<!--APP-START-->
+<div id="app">
+  <canvas id="game" aria-label="Skippy the Stone game"></canvas>
+  <div id="world-ui" aria-hidden="true"></div>
+
+  <div id="hud" class="hud" hidden>
+    <div class="hud-row">
+      <div class="chip energy" title="Energy: each throw costs some">
+        <svg class="energy-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M13.5 2 5 13.2h5.6L9.6 22l9.4-12.2h-5.8z"/></svg>
+        <div class="energy-bar"><i id="energy-fill"></i></div>
+        <b id="energy-num" class="num">100</b>
+      </div>
+      <div class="journey" aria-label="Journey home">
+        <div class="journey-track" id="journey-track">
+          <div class="journey-fill" id="journey-fill"></div>
+          <div class="journey-home" title="Home">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12.5 12 4l9 8.5V21h-6.2v-5.6H9.2V21H3z"/></svg>
+          </div>
+          <div class="journey-skippy" id="journey-skippy"></div>
+        </div>
+      </div>
+      <div class="chip score-chip">
+        <div class="score-col">
+          <span class="label">Score</span>
+          <b id="score" class="num">0</b>
+        </div>
+        <b id="mult" class="mult num">×1.0</b>
+      </div>
+      <button class="icon-btn" id="btn-sound" aria-label="Sound on">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path class="snd-on" d="M4 9h4l5-4v14l-5-4H4zM16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12"/><path class="snd-off" d="M4 9h4l5-4v14l-5-4H4zM17 9l5 6M22 9l-5 6"/></svg>
+      </button>
+      <button class="icon-btn" id="btn-menu" aria-label="Pause">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14M16 5v14"/></svg>
+      </button>
+    </div>
+    <div class="buffs" id="buffs"></div>
+  </div>
+
+  <div id="hint" class="hint" hidden></div>
+  <div id="toast" class="toast" hidden></div>
+  <div id="rotate-tip" class="rotate-tip" hidden>Turn your phone sideways to see more of the pond</div>
+
+  <section id="screen-title" class="screen title-screen">
+    <div class="title-card">
+      <h1 class="logo"><span class="logo-skippy">Skippy</span> <span class="logo-the">the</span> <span class="logo-stone">Stone</span></h1>
+      <p class="tagline">Skippy got tossed clear across Willow Pond. Skip him home, and make some friends on the way.</p>
+      <ol class="howto">
+        <li><span class="howto-ico"><svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="34" cy="18" r="7"/><path d="M28 22 10 34m0 0 2-7m-2 7 7-1"/></svg></span><span><b>Drag back</b> anywhere to aim</span></li>
+        <li><span class="howto-ico"><svg viewBox="0 0 48 48" aria-hidden="true"><rect x="6" y="19" width="36" height="10" rx="5"/><path d="M24 13v22"/></svg></span><span><b>Let go</b> when the needle hits gold for spin</span></li>
+        <li><span class="howto-ico"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M6 34c6-6 10-6 16 0s10 6 16 0"/><circle cx="24" cy="18" r="6"/></svg></span><span><b>Tap</b> as Skippy touches the water</span></li>
+      </ol>
+      <button class="pebble-btn big" id="btn-play">Play</button>
+      <button class="pebble-btn alt small" id="btn-fs-title" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg><span class="fs-label">Fullscreen</span></button>
+      <p class="best" id="best-line" hidden></p>
+    </div>
+  </section>
+
+  <section id="screen-end" class="screen end-screen" hidden>
+    <div class="end-card">
+      <div class="end-stars" id="end-stars"></div>
+      <h2 id="end-title">Home sweet home!</h2>
+      <p id="end-sub" class="end-sub"></p>
+      <dl class="tally" id="tally"></dl>
+      <div class="end-friends" id="end-friends"></div>
+      <div class="end-score"><span class="label">Score</span><b id="end-score" class="num">0</b></div>
+      <p class="new-best" id="new-best" hidden>New best!</p>
+      <div class="end-actions">
+        <button class="pebble-btn" id="btn-again">Play again</button>
+        <button class="pebble-btn alt" id="btn-continue" hidden>Keep going from the last pad</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="screen-menu" class="screen menu-screen" hidden>
+    <div class="menu-card">
+      <h2>Paused</h2>
+      <button class="pebble-btn" id="btn-resume">Resume</button>
+      <button class="pebble-btn alt" id="btn-fs-menu" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg><span class="fs-label">Fullscreen</span></button>
+      <button class="pebble-btn alt" id="btn-restart">Start the pond over</button>
+    </div>
+  </section>
+  <section id="screen-fs-help" class="screen menu-screen" hidden>
+    <div class="menu-card fs-help" role="dialog" aria-labelledby="fs-help-title">
+      <h2 id="fs-help-title">Fullscreen on iPhone</h2>
+      <p>iPhone browsers can't put a web game in fullscreen. Add Skippy to your Home Screen and he opens with no browser bars.</p>
+      <ol class="fs-steps">
+        <li id="fs-step-open">Open the play page</li>
+        <li>Tap Share, then Add to Home Screen</li>
+        <li>Open Skippy from your Home Screen</li>
+      </ol>
+      <p class="fs-note">Share is in the browser's toolbar or its ⋯ menu.</p>
+      <a class="pebble-btn" id="fs-open" href="#" target="_blank" rel="noopener">Open the play page</a>
+      <button class="pebble-btn alt" id="btn-fs-close">Got it</button>
+    </div>
+  </section>
+</div>
+<!--APP-END-->
+</body>
+</html>
